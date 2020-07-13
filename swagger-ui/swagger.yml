@@ -1,0 +1,226 @@
+---
+
+swagger: '2.0'
+info:
+  title: user manager
+  version: 1.0.0
+schemes:
+  - http
+basePath: /api
+paths:
+  /healthcheck:
+    get:
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      tags: [ "healthcheck" ]
+      operationId: healthcheck
+      summary: "Answering 200 if everything looks good"
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: "#/definitions/message"
+  /user:
+    post:
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      tags: ["User"]
+      operationId: createUser
+      summary: "Add a new user. If the user already exists the query will fail"
+      parameters:
+        - name: userData
+          in: body
+          schema:
+            $ref: "#/definitions/userData"
+      responses:
+        '201':
+          description: created
+          schema:
+            $ref: "#/definitions/nickName"
+        '400':
+          description: bad request
+          schema:
+            $ref: "#/definitions/error"
+        '500':
+          description: internal server error
+          schema:
+            $ref: "#/definitions/error"
+  /user/filter:
+    post:
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      tags: ["User"]
+      operationId: getUser
+      summary: "Get a list of user respecting the filter. You can use one or more filters to narrow your queries, all filters will be added with an AND"
+      parameters:
+        - name: userDataFilter
+          in: body
+          schema:
+            $ref: "#/definitions/userDataFilter"
+      responses:
+        '202':
+          description: OK
+          schema:
+            $ref: "#/definitions/userDataList"
+        '400':
+          description: bad request
+          schema:
+            $ref: "#/definitions/error"
+        '500':
+          description: internal server error
+          schema:
+            $ref: "#/definitions/error"
+  /user/{nickName}:
+    delete:
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      tags: ["User"]
+      operationId: deleteUser
+      summary: "Delete an already created User. If the user does not exist the query will fail"
+      parameters:
+        - in: path
+          name: nickName
+          type: string
+          required: true
+          description: NickName that uniquely identify an User
+      responses:
+        '203':
+          description: Deleted
+        '500':
+          description: internal server error
+          schema:
+            $ref: "#/definitions/error"
+        '400':
+          description: bad request
+          schema:
+            $ref: "#/definitions/error"
+    put:
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      tags: ["User"]
+      operationId: updateUser
+      summary: "Update an already created User. If the user does not exist the query will fail"
+      parameters:
+        - in: path
+          name: nickName
+          type: string
+          required: true
+          description: nickName that uniquely identify an User
+        - name: userData
+          in: body
+          schema:
+            $ref: "#/definitions/userData"
+      responses:
+        '202':
+          description: OK
+          schema:
+            $ref: "#/definitions/nickName"
+        '500':
+          description: internal server error
+          schema:
+            $ref: "#/definitions/error"
+        '400':
+          description: bad request
+          schema:
+            $ref: "#/definitions/error"
+definitions:
+  userData:
+    type: object
+    required:
+      - nickName
+    properties:
+      firstName:
+        type: string
+        description: firstName
+        example: paolo
+      secondName:
+        type: string
+        description: secondName
+        example: gallina
+      nickName:
+        type: string
+        description: nickName
+        example: gallocedrone
+      password:
+        type: string
+        description: password
+        example: supersecurepassword
+      email:
+        type: string
+        description: email
+        example: paologallina@gmail.com
+      country:
+        type: string
+        description: country
+        example: Italy
+
+  userDataNoPassword:
+    type: object
+    description: This object is a copy of userData without the password
+    properties:
+      firstName:
+        type: string
+        description: firstName
+        example: paolo
+      secondName:
+        type: string
+        description: secondName
+        example: gallina
+      nickName:
+        type: string
+        description: nickName
+        example: gallocedrone
+      email:
+        type: string
+        description: email
+        example: paologallina@gmail.com
+      country:
+        type: string
+        description: country
+        example: Italy
+  userDataFilter:
+    type: object
+    description: The porpouse of this object is to pass filtering data to the query
+    properties:
+      include:
+        $ref: "#/definitions/userDataNoPassword"
+        description: exclude elements with these values
+      exclude:
+        description: include elements with these values
+        $ref: "#/definitions/userDataNoPassword"
+
+  userDataList:
+    type: array
+    items:
+      $ref: "#/definitions/userDataNoPassword"
+  nickName:
+    type: string
+  error:
+    type: object
+    required:
+       - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string
+      fields:
+        type: string
+
+  message:
+    type: object
+    description: This is the message returned by the healthcheck
+    properties:
+      message:
+        type: string

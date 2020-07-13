@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  # User manager service
+  user-manager:
+    restart: always
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "35307:35307"
+    networks:
+      - mynetwork
+    links:
+      - "db"
+    depends_on:
+      - db
+  # A containerized mysql
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: users
+    ports:
+      - "3307:3306"
+    volumes:
+      - myvolume:/users.sql
+    networks:
+      - mynetwork
+
+volumes:
+  myvolume:
+
+networks:
+  mynetwork:

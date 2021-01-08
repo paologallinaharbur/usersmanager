@@ -21,7 +21,7 @@ import (
 	"github.com/paologallinaharbur/usersmanager/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../usersmanager --name URLShortener --spec ../swagger-ui/swagger.yml
+//go:generate swagger generate server --target ../../usersmanager --name usersmanager --spec ../swagger-ui/swagger.yml
 
 func configureAPI(api *operations.UserManagerAPI) http.Handler {
 	api.ServeError = errors.ServeError

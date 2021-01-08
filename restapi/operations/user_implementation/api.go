@@ -13,9 +13,9 @@ import (
 )
 
 //CreateUserHandler handles /api/user requests
-func CreateUserHandler(createURLParams user.CreateUserParams, db storage.Storage, sm messagingSystem.MessageQueue) middleware.Responder {
+func CreateUserHandler(createUserParams user.CreateUserParams, db storage.Storage, sm messagingSystem.MessageQueue) middleware.Responder {
 	logrus.Info("serving create user endpoint")
-	err := verifyUserPayload(createURLParams.UserData)
+	err := verifyUserPayload(createUserParams.UserData)
 	if err != nil {
 		message := err.Error()
 		middlewares.UserCreationError.Inc()
@@ -26,7 +26,7 @@ func CreateUserHandler(createURLParams user.CreateUserParams, db storage.Storage
 		})
 	}
 
-	err = db.AddUser(*createURLParams.UserData)
+	err = db.AddUser(*createUserParams.UserData)
 	if err != nil {
 		message := err.Error()
 		middlewares.UserCreationError.Inc()
@@ -37,9 +37,9 @@ func CreateUserHandler(createURLParams user.CreateUserParams, db storage.Storage
 		})
 	}
 
-	middlewares.UserCreated.Inc()                                                                       //incrementing the prometheus metric
-	sm.AddMessageToQueue("User Created! All data will follow...")                                       //informing a third service about the change
-	return user.NewCreateUserCreated().WithPayload(models.NickName(*createURLParams.UserData.NickName)) //answer the user
+	middlewares.UserCreated.Inc()                                                                        //incrementing the prometheus metric
+	sm.AddMessageToQueue("User Created! All data will follow...")                                        //informing a third service about the change
+	return user.NewCreateUserCreated().WithPayload(models.NickName(*createUserParams.UserData.NickName)) //answer the user
 }
 
 //DeleteUser handles DELETE /api/user/{NickName} requests

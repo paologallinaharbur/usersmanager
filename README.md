@@ -91,3 +91,4 @@ Improvements needed
  - the messaging system could become a bottleneck even with channels, it might be helpful creating a pool of goroutines 
    instead of a unique one to deal with network latency
  - Most options should be configured by Environment variables, currently it is not possible
+ - Pagination should be added in the list API

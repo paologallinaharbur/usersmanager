@@ -23,12 +23,12 @@ func TestCompleteFlow(t *testing.T) {
 	err = db.AddUser(user)
 	assert.NoError(t, err)
 
-	//updating
+	//updating the user
 	user.Country = "updated"
 	err = db.UpdateUser(user)
 	assert.NoError(t, err)
 
-	//list the user using the updated field
+	//list the user
 	list, err := db.ListUser(models.UserDataFilter{})
 	assert.NoError(t, err)
 
@@ -57,6 +57,43 @@ func TestApisDelete(t *testing.T) {
 	//second delete do not fail
 	err = db.DeleteUser("test")
 	assert.NoError(t, err)
+}
+
+func TestUpdate(t *testing.T) {
+	db := NewStorageDBInMemory("TestUpdate")
+	defer db.Close()
+
+	err := db.CreateUsersTable()
+	assert.NoError(t, err)
+
+	//cannot update, no user present
+	user := getUser()
+	err = db.UpdateUser(user)
+	assert.Error(t, err)
+
+	//create an user
+	err = db.AddUser(user)
+	assert.NoError(t, err)
+
+	//list the user
+	list, err := db.ListUser(models.UserDataFilter{})
+	assert.NoError(t, err)
+
+	assert.Len(t, list, 1)
+	assert.Equal(t, "UK", list[0].Country)
+
+	//updating the user
+	user.Country = "updated"
+	err = db.UpdateUser(user)
+	assert.NoError(t, err)
+
+	//list the user
+	list, err = db.ListUser(models.UserDataFilter{})
+	assert.NoError(t, err)
+
+	assert.Len(t, list, 1)
+	assert.Equal(t, "updated", list[0].Country)
+
 }
 
 func TestList(t *testing.T) {
